@@ -1,21 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:inewsfeed/modules/homepage/domain_layer/data_model/news_top_headlines_data_model.dart';
-import 'package:inewsfeed/modules/homepage/domain_layer/repository/news_repository.dart';
-import 'package:inewsfeed/modules/homepage/presentation_layer/providers/api_provider.dart';
+import 'package:inewsfeed/modules/homepage/data/models/news_top_headlines_data_model.dart';
+import 'package:inewsfeed/modules/homepage/domain/repository/news_repository.dart';
+import 'package:inewsfeed/modules/homepage/presentation/providers/api_provider.dart';
 import 'package:inewsfeed/shared/assets_helper.dart';
 import 'package:inewsfeed/shared/generic_error_screen.dart';
 import 'package:inewsfeed/shared/logger.dart';
 import 'package:inewsfeed/shared/network_requester/inf_exception.dart';
-import 'package:inewsfeed/shared/status.dart';
-import 'package:provider/provider.dart';
 
 class NewsProvider extends ChangeNotifier {
-  final NewsRepository _newsRepository;
-  final ApiProvider<NewsTopHeadlinesDataModel> _topHeadlinesNewsProvider;
+  final NewsRepository newsRepository;
+  final ApiProvider<NewsTopHeadlinesDataModel> topHeadlinesNewsProvider;
 
-  NewsProvider(this._newsRepository, this._topHeadlinesNewsProvider);
+  NewsProvider(this.newsRepository, this.topHeadlinesNewsProvider);
 
   void _handleError(int statusCode, String statusMsg, BuildContext context) {
     if (statusCode == 500) {
@@ -48,11 +46,11 @@ class NewsProvider extends ChangeNotifier {
     logger.e("Request failed with status: $statusCode, $statusMsg");
   }
 
-  Future<void> fetchTopHeadlines(BuildContext context) async {
+  void fetchTopHeadlines(BuildContext context) async {
     try {
-      _topHeadlinesNewsProvider.setLoading();
-      final newsData = await _newsRepository.getNewsTopHeadlinesData();
-      _topHeadlinesNewsProvider.setSuccess(newsData);
+      topHeadlinesNewsProvider.setLoading();
+      final newsData = await newsRepository.getNewsTopHeadlinesData();
+      topHeadlinesNewsProvider.setSuccess(newsData);
     } catch (e) {
       ///get offline data from local store.
 
@@ -73,12 +71,12 @@ class NewsProvider extends ChangeNotifier {
 
         ///TODO: show internet down page and then display cached data from local store.
       } else if (e is InfException) {
-        _topHeadlinesNewsProvider.setError(e);
-        if(context.mounted){
-        _handleError(e.statusCode, e.msg, context);
+        topHeadlinesNewsProvider.setError(e);
+        if (context.mounted) {
+          _handleError(e.statusCode, e.msg, context);
         }
       } else {
-        _topHeadlinesNewsProvider.setError(e);
+        topHeadlinesNewsProvider.setError(e);
         logger.e("unhandled exception: $e");
       }
     }
