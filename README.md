@@ -1,6 +1,6 @@
 # iNewsFeed
 
-A news app, that displays top headlines. Used Provider for state management. Take inspiration from Clean Architecture in making the folder structure.
+A news app, that displays top headlines. Used Provider for state management.
 
 ## Demo Video Android
 
